@@ -1,0 +1,9 @@
+{
+  "id": "focus-mode-plus",
+  "name": "Focus Mode+",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Режим фокуса с таймером, статистикой и рекомендациями",
+  "author": "CTRL+ALT+ELITE",
+  "isDesktopOnly": false
+}
