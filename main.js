@@ -215,6 +215,47 @@ module.exports = class FocusModePlus extends Plugin {
             }
         }
     }
+
+    applyUILimitations() {
+        if (this.settings.hideSidebars) {
+            const workspace = this.app.workspace;
+            this.originalSidebarState = {
+                left: workspace.leftSplit.collapsed,
+                right: workspace.rightSplit.collapsed
+            };
+            workspace.leftSplit.collapse();
+            workspace.rightSplit.collapse();
+        }
+        
+        if (this.settings.dimNonActiveNotes) {
+            document.body.classList.add("focus-mode-dim-others");
+        }
+        
+        if (this.settings.hideStatusBar) {
+            document.body.classList.add("focus-mode-hide-statusbar");
+        }
+        
+        document.body.classList.add("focus-mode-active");
+    }
+    
+    restoreUI() {
+        if (this.settings.hideSidebars && this.originalSidebarState) {
+            const workspace = this.app.workspace;
+            if (!this.originalSidebarState.left) workspace.leftSplit.expand();
+            if (!this.originalSidebarState.right) workspace.rightSplit.expand();
+            this.originalSidebarState = null;
+        }
+        
+        if (this.settings.dimNonActiveNotes) {
+            document.body.classList.remove("focus-mode-dim-others");
+        }
+        
+        if (this.settings.hideStatusBar) {
+            document.body.classList.remove("focus-mode-hide-statusbar");
+        }
+        
+        document.body.classList.remove("focus-mode-active");
+    }
 }
 class FocusTimer {
     constructor(statusBar, onComplete) {
