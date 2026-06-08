@@ -256,6 +256,33 @@ module.exports = class FocusModePlus extends Plugin {
         
         document.body.classList.remove("focus-mode-active");
     }
+
+    async saveStats() {
+        await this.saveData(this.stats.save());
+    }
+    async loadSettings() {
+        try {
+            const loadedData = await this.loadData();
+            
+            if (loadedData && loadedData.settings) {
+                this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData.settings);
+            } else if (loadedData && !loadedData.settings) {
+                this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
+            } else {
+                this.settings = Object.assign({}, DEFAULT_SETTINGS);
+            }
+            
+            if (loadedData && loadedData.data) {
+                this.stats.data = loadedData.data;
+            }
+            if (loadedData && loadedData.achievements) {
+                this.stats.achievements = loadedData.achievements;
+            }
+        } catch (e) {
+            console.error("Error loading settings:", e);
+            this.settings = Object.assign({}, DEFAULT_SETTINGS);
+        }
+    }
 }
 class FocusTimer {
     constructor(statusBar, onComplete) {
