@@ -260,6 +260,7 @@ module.exports = class FocusModePlus extends Plugin {
     async saveStats() {
         await this.saveData(this.stats.save());
     }
+    
     async loadSettings() {
         try {
             const loadedData = await this.loadData();
@@ -282,6 +283,28 @@ module.exports = class FocusModePlus extends Plugin {
             console.error("Error loading settings:", e);
             this.settings = Object.assign({}, DEFAULT_SETTINGS);
         }
+    }
+
+    async saveSettings() {
+        try {
+            await this.saveData({ 
+                settings: this.settings, 
+                data: this.stats.data, 
+                achievements: this.stats.achievements 
+            });
+        } catch (e) {
+            console.error("Error saving settings:", e);
+        }
+    }
+
+    onunload() {
+        console.log("Выгрузка Focus Mode+");
+        if (this.notificationBlocker && this.notificationBlocker.isActive) {
+            this.notificationBlocker.deactivate();
+        }
+        this.restoreUI();
+        if (this.timer) this.timer.stop();
+        if (this.ribbonContainer) this.ribbonContainer.remove();
     }
 }
 class FocusTimer {
