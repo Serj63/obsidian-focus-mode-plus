@@ -503,3 +503,56 @@ class FocusStats {
         return { date: best.date, minutes: Math.round(best.totalFocusSeconds / 60) };
     }
 }
+
+class StatsModal extends Modal {
+    constructor(app, stats) {
+        super(app);
+        this.stats = stats;
+    }
+    
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.addClass("focus-stats-modal");
+        
+        const level = this.stats.getCurrentLevel();
+        const totalMinutes = this.stats.getTotalMinutes();
+        const totalHours = (totalMinutes / 60).toFixed(1);
+        
+        contentEl.createEl("h2", { text: `${level.icon} Ваш уровень: ${level.name}`, attr: { style: `color: ${level.color}` } });
+        
+        const nextLevel = this.stats.getNextLevel();
+        if (nextLevel) {
+            const progress = this.stats.getProgressToNextLevel();
+            contentEl.createEl("p", { text: `До ${nextLevel.name}: ${Math.round(progress)}%` });
+            const progressBar = contentEl.createEl("div", { cls: "progress-bar" });
+            progressBar.createEl("div", { cls: "progress-fill", attr: { style: `width: ${progress}%` } });
+            contentEl.createEl("small", { text: `Всего минут: ${Math.round(totalMinutes)} / ${nextLevel.minMinutes}` });
+        }
+        
+        contentEl.createEl("h3", { text: "📊 Основные показатели" });
+        const statsGrid = contentEl.createEl("div", { cls: "stats-grid" });
+        statsGrid.createEl("div", { text: `⏱️ Всего часов: ${totalHours}`, cls: "stat-card" });
+        statsGrid.createEl("div", { text: `🎯 Сессий: ${this.stats.getTotalSessions()}`, cls: "stat-card" });
+        statsGrid.createEl("div", { text: `✅ Завершено: ${this.stats.getCompletedSessions()}`, cls: "stat-card" });
+        statsGrid.createEl("div", { text: `📅 Текущая серия: ${this.stats.getStreak()} дней`, cls: "stat-card" });
+        
+        const achievements = this.stats.getUnlockedAchievements();
+        if (achievements.length > 0) {
+            contentEl.createEl("h3", { text: "🏅 Достижения" });
+            const achDiv = contentEl.createEl("div", { cls: "achievements" });
+            for (const ach of achievements) {
+                achDiv.createEl("div", { text: `${ach.name} — ${ach.description}`, cls: "achievement" });
+            }
+        }
+        
+        const best = this.stats.getBestDay();
+        if (best) {
+            contentEl.createEl("p", { text: `🏆 Рекордный день: ${best.date} — ${best.minutes} минут` });
+        }
+    }
+    
+    onClose() {
+        this.contentEl.empty();
+    }
+}
