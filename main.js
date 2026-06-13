@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
     autoStartBreakTimer: false,
     defaultFocusMinutes: 25,
     collectAnalytics: true,
+    showRibbonButtons: true
 };
 
 const PRODUCTIVITY_LEVELS = [
