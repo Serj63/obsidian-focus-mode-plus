@@ -692,3 +692,55 @@ class NotificationBlocker {
         this.settings = settings;
     }
 }
+
+class RecommendationsModal extends Modal {
+    constructor(app, stats) {
+        super(app);
+        this.stats = stats;
+    }
+    
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.createEl("h2", { text: "💡 Персональные рекомендации" });
+        
+        const totalMinutes = this.stats.getTotalMinutes();
+        
+        const recList = contentEl.createEl("div", { cls: "recommendations-list" });
+        
+        if (totalMinutes < 30) {
+            recList.createEl("p", { text: "🌟 Начните с малого: 5-10 минут фокуса уже дадут результат!" });
+            recList.createEl("p", { text: "📅 Поставьте цель: 3 короткие сессии в день" });
+        } else if (totalMinutes < 90) {
+            recList.createEl("p", { text: "⚡ Попробуйте технику Pomodoro: 25 минут работы, 5 отдыха" });
+            recList.createEl("p", { text: "🎧 Создайте плейлист без слов для концентрации" });
+        } else if (totalMinutes < 180) {
+            recList.createEl("p", { text: "🔥 Вы уже в зоне! Добавьте физическую активность между сессиями" });
+            recList.createEl("p", { text: "📝 Ведите журнал того, на что потратили фокус" });
+        } else {
+            recList.createEl("p", { text: "💪 Вы мастер! Делитесь опытом с другими" });
+            recList.createEl("p", { text: "🧠 Попробуйте ультра-дифокусировку: полное отключение на 15 минут" });
+        }
+        
+        const early = this.stats.getEarlySessions();
+        const late = this.stats.getLateSessions();
+        if (early > late && early > 0) {
+            recList.createEl("p", { text: "🌅 Вы продуктивнее утром. Планируйте сложные задачи на первую половину дня!" });
+        } else if (late > early && late > 0) {
+            recList.createEl("p", { text: "🦉 Вечер — ваше время. Используйте утро для рутины и планирования." });
+        }
+        
+        const nextLevel = this.stats.getNextLevel();
+        if (nextLevel) {
+            const need = Math.round(nextLevel.minMinutes - totalMinutes);
+            recList.createEl("p", { text: `🎯 До уровня ${nextLevel.name} осталось ${need} минут фокуса. Это примерно ${Math.ceil(need/25)} сессий по 25 минут!` });
+        }
+        
+        contentEl.createEl("hr");
+        contentEl.createEl("p", { text: "✨ Помните: каждый день фокуса делает вас лучше на 1%", cls: "motivation" });
+    }
+    
+    onClose() {
+        this.contentEl.empty();
+    }
+}
